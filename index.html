@@ -182,7 +182,7 @@
                 { color: "#283593", books: [] }, 
                 { color: "#6a1b9a", books: [] }
             ]
-        }; // <-- 之前少的是這個符號
+        };
 
         let currentCabinet = 'SEVENTEEN';
 
@@ -199,12 +199,16 @@
                     <div class="cabinet-header">${currentCabinet}</div>
                     ${layers.map(layer => `
                         <div class="shelf-layer">
-                            ${layer.books.map(book => `
-                                <div class="novel-spine" style="background-color: ${layer.color}" onclick='openModal(${JSON.stringify(book)})'>
-                                    <div class="spine-title">${book.title}</div>
-                                    <div class="spine-color-code">${layer.color}</div>
-                                </div>
-                            `).join('')}
+                            ${layer.books.map(book => {
+                                // 修正處：將 JSON 字串中的雙引號與單引號做好 HTML 安全轉義，防止 HTML 屬性被截斷
+                                const bookJson = JSON.stringify(book).replace(/'/g, "&apos;").replace(/"/g, "&quot;");
+                                return `
+                                    <div class="novel-spine" style="background-color: ${layer.color}" onclick="openModal('${bookJson}')">
+                                        <div class="spine-title">${book.title}</div>
+                                        <div class="spine-color-code">${layer.color}</div>
+                                    </div>
+                                `;
+                            }).join('')}
                             ${Array(Math.max(0, 8 - layer.books.length)).fill(0).map(() => `<div style="border-left: 1px solid rgba(0,0,0,0.05); height: 10px;"></div>`).join('')}
                         </div>
                     `).join('')}
@@ -221,7 +225,9 @@
             renderCabinet(filteredLayers);
         }
 
-        function openModal(book) {
+        // 修正處：傳進來的 book 在方案 A 中是轉義過的 JSON 字串，需解析回 Object
+        function openModal(bookData) {
+            const book = typeof bookData === 'string' ? JSON.parse(bookData) : bookData;
             const body = document.getElementById('modalBody');
             body.innerHTML = `
                 <div class="book-detail-title">${book.title}</div>
