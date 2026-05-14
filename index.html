@@ -24,7 +24,7 @@
             align-items: center;
         }
 
-        /* 導覽列與搜尋框 */
+        /* 導覽列 */
         nav {
             width: 100%;
             background-color: var(--shelf-wood);
@@ -38,27 +38,16 @@
             gap: 10px;
         }
 
-        .nav-links { display: flex; gap: 40px; }
+        .nav-links { display: flex; gap: 25px; flex-wrap: wrap; justify-content: center; }
         .nav-item {
             color: white;
             cursor: pointer;
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             text-decoration: none;
         }
 
-        .search-container {
-            width: 80%;
-            max-width: 400px;
-        }
-
-        #shipSearch {
-            width: 100%;
-            padding: 8px 15px;
-            border-radius: 20px;
-            border: none;
-            font-size: 1rem;
-            outline: none;
-        }
+        .search-container { width: 80%; max-width: 400px; }
+        #shipSearch { width: 100%; padding: 8px 15px; border-radius: 20px; border: none; outline: none; }
 
         .cover-header {
             width: 100%;
@@ -69,13 +58,23 @@
 
         .motto { font-size: 1.4rem; line-height: 2.2; letter-spacing: 3px; color: #5d4037; }
 
-        /* 書櫃 */
         .big-cabinet {
             width: 95%;
             max-width: 1000px;
             border: 12px solid var(--shelf-wood);
             background-color: #ebe4d8;
             box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+            margin-top: 20px;
+        }
+
+        .cabinet-header {
+            background-color: var(--shelf-wood);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            letter-spacing: 4px;
         }
 
         .shelf-layer {
@@ -88,7 +87,6 @@
             align-items: flex-end;
         }
 
-        /* 書脊 */
         .novel-spine {
             height: 230px;
             display: flex;
@@ -113,15 +111,13 @@
             text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
         }
 
-        /* 調大色號字體 */
         .spine-color-code {
             color: rgba(255,255,255,0.9);
             font-size: 0.85rem;
             font-weight: bold;
-            letter-spacing: 1px;
         }
 
-        /* 彈窗簡介 (仿 image_cbe37c.png) */
+        /* 彈窗樣式 */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -132,55 +128,16 @@
             align-items: center;
         }
 
-        .modal-content {
-            background: var(--modal-bg);
-            width: 90%;
-            max-width: 700px;
-            padding: 40px;
-            border-radius: 10px;
-            position: relative;
-        }
+        .modal-content { background: var(--modal-bg); width: 90%; max-width: 700px; padding: 40px; border-radius: 10px; position: relative; }
+        .close-btn { position: absolute; top: 15px; right: 15px; font-size: 1.5rem; cursor: pointer; border: 2px solid #333; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; border-radius: 5px; }
 
-        .close-btn {
-            position: absolute;
-            top: 15px; right: 15px;
-            font-size: 1.5rem;
-            cursor: pointer;
-            border: 2px solid #333;
-            width: 35px; height: 35px;
-            display: flex; align-items: center; justify-content: center;
-            border-radius: 5px;
-        }
-
-        /* 仿範例的底線清單排版 */
-        .ao3-tags {
-            font-size: 1.1rem;
-            line-height: 1.8;
-            margin: 20px 0;
-            color: #333;
-        }
-
-        .ao3-tags span {
-            border-bottom: 1px dotted var(--tag-underline);
-            margin-right: 8px;
-            cursor: default;
-        }
-
+        .ao3-tags { font-size: 1.1rem; line-height: 1.8; margin: 20px 0; color: #333; }
+        .ao3-tags span { border-bottom: 1px dotted var(--tag-underline); margin-right: 8px; }
         .ao3-tags .tag-bold { font-weight: bold; border-bottom: 1px solid #000; }
 
         .book-detail-title { font-size: 2.8rem; margin: 15px 0 5px 0; }
         .book-author { font-size: 1.2rem; color: #666; margin-bottom: 25px; border-bottom: 1px solid #ddd; padding-bottom: 10px; }
-
-        .read-btn {
-            background: #4b32c3;
-            color: white;
-            padding: 12px 30px;
-            border-radius: 8px;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 1.2rem;
-            margin-top: 20px;
-        }
+        .read-btn { background: #4b32c3; color: white; padding: 12px 30px; border-radius: 8px; text-decoration: none; display: inline-block; font-size: 1.2rem; margin-top: 20px; }
 
         @media (max-width: 600px) { .shelf-layer { grid-template-columns: repeat(4, 1fr); } }
     </style>
@@ -189,11 +146,13 @@
 
     <nav>
         <div class="nav-links">
-            <div class="nav-item" onclick="switchGroup('SEVENTEEN')">SEVENTEEN</div>
-            <div class="nav-item" onclick="switchGroup('CRAVITY')">CRAVITY</div>
+            <div class="nav-item" onclick="switchCabinet('SEVENTEEN')">SEVENTEEN</div>
+            <div class="nav-item" onclick="switchCabinet('CRAVITY')">CRAVITY</div>
+            <div class="nav-item" onclick="switchCabinet('摯愛')">摯愛</div>
+            <div class="nav-item" onclick="switchCabinet('自肥')">自肥</div>
         </div>
         <div class="search-container">
-            <input type="text" id="shipSearch" placeholder="搜尋 CP 名稱 (例如：喆漢)..." oninput="handleSearch()">
+            <input type="text" id="shipSearch" placeholder="搜尋 CP 名稱..." oninput="handleSearch()">
         </div>
     </nav>
 
@@ -214,33 +173,39 @@
     </div>
 
     <script>
+        const colorPalette = ["#c62828", "#ef6c00", "#f9a825", "#2e7d32", "#1565c0", "#283593", "#6a1b9a"];
+        
+        // 這是你的資料區，可以在這裡新增書籍
         const libraryData = {
             "SEVENTEEN": [
-                { color: "#c62828", books: [{title: "親愛的路人", author: "一比嘎", ships: ["喆漢", "知漢"], tags: ["全年齡", "短篇完結", "現向IF", "無需特別警告"], link: "#"}] },
-                { color: "#ef6c00", books: [] }, { color: "#f9a825", books: [] }, 
-                { color: "#2e7d32", books: [] }, { color: "#1565c0", books: [] }, 
-                { color: "#283593", books: [] }, { color: "#6a1b9a", books: [] }
+                { color: "#c62828", books: [{title: "親愛的路人", author: "一比嘎", ships: ["喆漢"], tags: ["全年齡", "短篇完結"], link: "#"}] },
+                { color: "#ef6c00", books: [] }, { color: "#f9a825", books: [] }, { color: "#2e7d32", books: [] }, { color: "#1565c0", books: [] }, { color: "#283593", books: [] }, { color: "#6a1b9a", books: [] }
             ],
             "CRAVITY": [
-                { color: "#c62828", books: [{title: "巧克力重疊", author: "作者名", ships: ["世琳/廷彬"], tags: ["甜文", "短篇"], link: "#"}] },
-                { color: "#ef6c00", books: [] }, { color: "#f9a825", books: [] }, 
-                { color: "#2e7d32", books: [] }, { color: "#1565c0", books: [] }, 
-                { color: "#283593", books: [] }, { color: "#6a1b9a", books: [] }
+                { color: "#c62828", books: [] }, { color: "#ef6c00", books: [] }, { color: "#f9a825", books: [] }, { color: "#2e7d32", books: [] }, { color: "#1565c0", books: [] }, { color: "#283593", books: [] }, { color: "#6a1b9a", books: [] }
+            ],
+            "摯愛": [
+                { color: "#c62828", books: [] }, { color: "#ef6c00", books: [] }, { color: "#f9a825", books: [] }, { color: "#2e7d32", books: [] }, { color: "#1565c0", books: [] }, { color: "#283593", books: [] }, { color: "#6a1b9a", books: [] }
+            ],
+            "自肥": [
+                { color: "#c62828", books: [{title: "我的大作", author: "你自己", ships: ["私心組合"], tags: ["自肥區"], link: "#"}] },
+                { color: "#ef6c00", books: [] }, { color: "#f9a825", books: [] }, { color: "#2e7d32", books: [] }, { color: "#1565c0", books: [] }, { color: "#283593", books: [] }, { color: "#6a1b9a", books: [] }
             ]
         };
 
-        let currentGroup = 'SEVENTEEN';
+        let currentCabinet = 'SEVENTEEN';
 
-        function switchGroup(groupName) {
-            currentGroup = groupName;
-            document.getElementById('shipSearch').value = ''; 
-            renderLibrary(libraryData[groupName]);
+        function switchCabinet(name) {
+            currentCabinet = name;
+            document.getElementById('shipSearch').value = '';
+            renderCabinet(libraryData[name]);
         }
 
-        function renderLibrary(layers) {
+        function renderCabinet(layers) {
             const root = document.getElementById('library-root');
             root.innerHTML = `
                 <div class="big-cabinet">
+                    <div class="cabinet-header">${currentCabinet}</div>
                     ${layers.map(layer => `
                         <div class="shelf-layer">
                             ${layer.books.map(book => `
@@ -258,13 +223,11 @@
 
         function handleSearch() {
             const term = document.getElementById('shipSearch').value.toLowerCase();
-            const filteredLayers = libraryData[currentGroup].map(layer => ({
+            const filteredLayers = libraryData[currentCabinet].map(layer => ({
                 ...layer,
-                books: layer.books.filter(book => 
-                    book.ships.some(ship => ship.toLowerCase().includes(term))
-                )
+                books: layer.books.filter(book => book.ships.some(ship => ship.toLowerCase().includes(term)))
             }));
-            renderLibrary(filteredLayers);
+            renderCabinet(filteredLayers);
         }
 
         function openModal(book) {
@@ -273,18 +236,18 @@
                 <div class="book-detail-title">${book.title}</div>
                 <div class="book-author">by ${book.author}</div>
                 <div class="ao3-tags">
-                    <span class="tag-bold">${book.tags[book.tags.length-1]}</span>,
+                    <span class="tag-bold">${book.tags[0]}</span>,
                     ${book.ships.map(s => `<span>${s}</span>`).join(', ')},
-                    ${book.tags.slice(0, -1).map(t => `<span>${t}</span>`).join(', ')}
+                    ${book.tags.slice(1).map(t => `<span>${t}</span>`).join(', ')}
                 </div>
-                <a href="${book.link}" class="read-btn">閱讀原文 →</a>
+                <a href="${book.link}" target="_blank" class="read-btn">閱讀原文 →</a>
             `;
             document.getElementById('modalOverlay').style.display = 'flex';
         }
 
         function closeModal() { document.getElementById('modalOverlay').style.display = 'none'; }
 
-        switchGroup('SEVENTEEN');
+        switchCabinet('SEVENTEEN');
     </script>
 </body>
 </html>
