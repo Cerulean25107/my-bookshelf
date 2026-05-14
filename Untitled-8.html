@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>私人書齋 | 辰光與驚嘆</title>
+    <style>
+        :root {
+            --bg-color: #fcfaf2;
+            --header-bg: #f3efdf;
+            --shelf-wood: #8d6e63;
+            --modal-bg: rgba(255, 255, 255, 0.98);
+            --tag-underline: #555;
+        }
+
+        * { font-family: "DFKai-SB", "BiauKai", "標楷體", serif; }
+
+        body {
+            background-color: var(--bg-color);
+            margin: 0;
+            padding-bottom: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* 導覽列與搜尋框 */
+        nav {
+            width: 100%;
+            background-color: var(--shelf-wood);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-links { display: flex; gap: 40px; }
+        .nav-item {
+            color: white;
+            cursor: pointer;
+            font-size: 1.3rem;
+            text-decoration: none;
+        }
+
+        .search-container {
+            width: 80%;
+            max-width: 400px;
+        }
+
+        #shipSearch {
+            width: 100%;
+            padding: 8px 15px;
+            border-radius: 20px;
+            border: none;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .cover-header {
+            width: 100%;
+            padding: 50px 20px;
+            text-align: center;
+            background: linear-gradient(to bottom, var(--header-bg), var(--bg-color));
+        }
+
+        .motto { font-size: 1.4rem; line-height: 2.2; letter-spacing: 3px; color: #5d4037; }
+
+        /* 書櫃 */
+        .big-cabinet {
+            width: 95%;
+            max-width: 1000px;
+            border: 12px solid var(--shelf-wood);
+            background-color: #ebe4d8;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+        }
+
+        .shelf-layer {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 8px;
+            padding: 30px 15px 0 15px;
+            border-bottom: 15px solid var(--shelf-wood);
+            min-height: 260px;
+            align-items: flex-end;
+        }
+
+        /* 書脊 */
+        .novel-spine {
+            height: 230px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            border-radius: 2px 2px 0 0;
+            box-shadow: inset -4px 0 6px rgba(0,0,0,0.2), 2px 0 10px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+            cursor: pointer;
+            padding: 15px 5px;
+            box-sizing: border-box;
+        }
+
+        .novel-spine:hover { transform: translateY(-20px); }
+
+        .spine-title {
+            writing-mode: vertical-rl;
+            color: white;
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        /* 調大色號字體 */
+        .spine-color-code {
+            color: rgba(255,255,255,0.9);
+            font-size: 0.85rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        /* 彈窗簡介 (仿 image_cbe37c.png) */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 200;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: var(--modal-bg);
+            width: 90%;
+            max-width: 700px;
+            padding: 40px;
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px; right: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            border: 2px solid #333;
+            width: 35px; height: 35px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 5px;
+        }
+
+        /* 仿範例的底線清單排版 */
+        .ao3-tags {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin: 20px 0;
+            color: #333;
+        }
+
+        .ao3-tags span {
+            border-bottom: 1px dotted var(--tag-underline);
+            margin-right: 8px;
+            cursor: default;
+        }
+
+        .ao3-tags .tag-bold { font-weight: bold; border-bottom: 1px solid #000; }
+
+        .book-detail-title { font-size: 2.8rem; margin: 15px 0 5px 0; }
+        .book-author { font-size: 1.2rem; color: #666; margin-bottom: 25px; border-bottom: 1px solid #ddd; padding-bottom: 10px; }
+
+        .read-btn {
+            background: #4b32c3;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 1.2rem;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 600px) { .shelf-layer { grid-template-columns: repeat(4, 1fr); } }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="nav-links">
+            <div class="nav-item" onclick="switchGroup('SEVENTEEN')">SEVENTEEN</div>
+            <div class="nav-item" onclick="switchGroup('CRAVITY')">CRAVITY</div>
+        </div>
+        <div class="search-container">
+            <input type="text" id="shipSearch" placeholder="搜尋 CP 名稱 (例如：喆漢)..." oninput="handleSearch()">
+        </div>
+    </nav>
+
+    <header class="cover-header">
+        <div class="motto">
+            「我們積極相聚也毫不掙扎地品嚐捨離，<br>
+            遂把所能擁有的辰光化成分分秒秒的驚嘆。」
+        </div>
+    </header>
+
+    <div id="library-root"></div>
+
+    <div class="modal-overlay" id="modalOverlay" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <span class="close-btn" onclick="closeModal()">✕</span>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <script>
+        const libraryData = {
+            "SEVENTEEN": [
+                { color: "#c62828", books: [{title: "親愛的路人", author: "一比嘎", ships: ["喆漢", "知漢"], tags: ["全年齡", "短篇完結", "現向IF", "無需特別警告"], link: "#"}] },
+                { color: "#ef6c00", books: [] }, { color: "#f9a825", books: [] }, 
+                { color: "#2e7d32", books: [] }, { color: "#1565c0", books: [] }, 
+                { color: "#283593", books: [] }, { color: "#6a1b9a", books: [] }
+            ],
+            "CRAVITY": [
+                { color: "#c62828", books: [{title: "巧克力重疊", author: "作者名", ships: ["世琳/廷彬"], tags: ["甜文", "短篇"], link: "#"}] },
+                { color: "#ef6c00", books: [] }, { color: "#f9a825", books: [] }, 
+                { color: "#2e7d32", books: [] }, { color: "#1565c0", books: [] }, 
+                { color: "#283593", books: [] }, { color: "#6a1b9a", books: [] }
+            ]
+        };
+
+        let currentGroup = 'SEVENTEEN';
+
+        function switchGroup(groupName) {
+            currentGroup = groupName;
+            document.getElementById('shipSearch').value = ''; 
+            renderLibrary(libraryData[groupName]);
+        }
+
+        function renderLibrary(layers) {
+            const root = document.getElementById('library-root');
+            root.innerHTML = `
+                <div class="big-cabinet">
+                    ${layers.map(layer => `
+                        <div class="shelf-layer">
+                            ${layer.books.map(book => `
+                                <div class="novel-spine" style="background-color: ${layer.color}" onclick='openModal(${JSON.stringify(book)})'>
+                                    <div class="spine-title">${book.title}</div>
+                                    <div class="spine-color-code">${layer.color}</div>
+                                </div>
+                            `).join('')}
+                            ${Array(Math.max(0, 8 - layer.books.length)).fill(0).map(() => `<div style="border-left: 1px solid rgba(0,0,0,0.05); height: 10px;"></div>`).join('')}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function handleSearch() {
+            const term = document.getElementById('shipSearch').value.toLowerCase();
+            const filteredLayers = libraryData[currentGroup].map(layer => ({
+                ...layer,
+                books: layer.books.filter(book => 
+                    book.ships.some(ship => ship.toLowerCase().includes(term))
+                )
+            }));
+            renderLibrary(filteredLayers);
+        }
+
+        function openModal(book) {
+            const body = document.getElementById('modalBody');
+            body.innerHTML = `
+                <div class="book-detail-title">${book.title}</div>
+                <div class="book-author">by ${book.author}</div>
+                <div class="ao3-tags">
+                    <span class="tag-bold">${book.tags[book.tags.length-1]}</span>,
+                    ${book.ships.map(s => `<span>${s}</span>`).join(', ')},
+                    ${book.tags.slice(0, -1).map(t => `<span>${t}</span>`).join(', ')}
+                </div>
+                <a href="${book.link}" class="read-btn">閱讀原文 →</a>
+            `;
+            document.getElementById('modalOverlay').style.display = 'flex';
+        }
+
+        function closeModal() { document.getElementById('modalOverlay').style.display = 'none'; }
+
+        switchGroup('SEVENTEEN');
+    </script>
+</body>
+</html>
