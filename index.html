@@ -1,99 +1,235 @@
-<script>
-    // 這裡是你所有書櫃的資料區
-    const libraryData = {
-        "SEVENTEEN": [
-            { color: "#c62828", books: [{title: "親愛的路人", author: "一比嘎", ships: ["喆漢"], tags: ["G", "Complete"], link: "#"}] },
-            { color: "#ef6c00", books: [] }, 
-            { color: "#f9a825", books: [] }, 
-            { color: "#2e7d32", books: [] }, 
-            { color: "#1565c0", books: [] }, 
-            { color: "#283593", books: [] }, 
-            { color: "#6a1b9a", books: [] }
-        ],
-        "CRAVITY": [
-            { color: "#c62828", books: [] }, { color: "#ef6c00", books: [] }, { color: "#f9a825", books: [] }, { color: "#2e7d32", books: [] }, { color: "#1565c0", books: [] }, { color: "#283593", books: [] }, { color: "#6a1b9a", books: [] }
-        ],
-        "My Love": [
-            { color: "#c62828", books: [] }, { color: "#ef6c00", books: [] }, { color: "#f9a825", books: [] }, { color: "#2e7d32", books: [] }, { color: "#1565c0", books: [] }, { color: "#283593", books: [] }, { color: "#6a1b9a", books: [] }
-        ],
-        "Cerulean": [
-            { 
-                color: "#c62828", 
-                books: [
-                    {
-                        title: "你的書名", 
-                        author: "你的名字", 
-                        ships: ["角色A/角色B"], 
-                        tags: ["G", "Complete", "你的標籤"], 
-                        link: "小說網址"
-                    }
-                ] 
-            },
-            { color: "#ef6c00", books: [] }, 
-            { color: "#f9a825", books: [] }, 
-            { color: "#2e7d32", books: [] }, 
-            { color: "#1565c0", books: [] }, 
-            { color: "#283593", books: [] }, 
-            { color: "#6a1b9a", books: [] }
-        ]
-    };
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Private Library | Cerulean</title>
+    <style>
+        :root {
+            --bg-color: #fcfaf2;
+            --header-bg: #f3efdf;
+            --shelf-wood: #8d6e63;
+            --modal-bg: rgba(255, 255, 255, 0.98);
+            --tag-underline: #555;
+        }
 
-    let currentCabinet = 'SEVENTEEN';
+        * { font-family: "DFKai-SB", "BiauKai", "標楷體", serif; }
 
-    function switchCabinet(name) {
-        currentCabinet = name;
-        document.getElementById('shipSearch').value = '';
-        renderCabinet(libraryData[name]);
-    }
+        body {
+            background-color: var(--bg-color);
+            margin: 0;
+            padding-bottom: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-    function renderCabinet(layers) {
-        const root = document.getElementById('library-root');
-        root.innerHTML = `
-            <div class="big-cabinet">
-                <div class="cabinet-header">${currentCabinet}</div>
-                ${layers.map(layer => `
-                    <div class="shelf-layer">
-                        ${layer.books.map(book => `
-                            <div class="novel-spine" style="background-color: ${layer.color}" onclick='openModal(${JSON.stringify(book)})'>
-                                <div class="spine-title">${book.title}</div>
-                                <div class="spine-color-code">${layer.color}</div>
-                            </div>
-                        `).join('')}
-                        ${Array(Math.max(0, 8 - layer.books.length)).fill(0).map(() => `<div style="border-left: 1px solid rgba(0,0,0,0.05); height: 10px;"></div>`).join('')}
-                    </div>
-                `).join('')}
-            </div>
-        `;
-    }
+        nav {
+            width: 100%;
+            background-color: var(--shelf-wood);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
 
-    function handleSearch() {
-        const term = document.getElementById('shipSearch').value.toLowerCase();
-        const filteredLayers = libraryData[currentCabinet].map(layer => ({
-            ...layer,
-            books: layer.books.filter(book => book.ships.some(ship => ship.toLowerCase().includes(term)))
-        }));
-        renderCabinet(filteredLayers);
-    }
+        .nav-links { display: flex; gap: 25px; flex-wrap: wrap; justify-content: center; }
+        .nav-item { color: white; cursor: pointer; font-size: 1.2rem; text-decoration: none; letter-spacing: 1px; }
 
-    function openModal(book) {
-        const body = document.getElementById('modalBody');
-        body.innerHTML = `
-            <div class="book-detail-title">${book.title}</div>
-            <div class="book-author">by ${book.author}</div>
-            <div class="ao3-tags">
-                <span class="tag-bold">${book.tags[0] || 'Tag'}</span>,
-                ${book.ships.map(s => `<span>${s}</span>`).join(', ')},
-                ${book.tags.slice(1).map(t => `<span>${t}</span>`).join(', ')}
-            </div>
-            <a href="${book.link}" target="_blank" class="read-btn">Read Original →</a>
-        `;
-        document.getElementById('modalOverlay').style.display = 'flex';
-    }
+        .search-container { width: 80%; max-width: 400px; }
+        #shipSearch { width: 100%; padding: 8px 15px; border-radius: 20px; border: none; outline: none; }
 
-    function closeModal() {
-        document.getElementById('modalOverlay').style.display = 'none';
-    }
+        .cover-header {
+            width: 100%;
+            padding: 50px 20px;
+            text-align: center;
+            background: linear-gradient(to bottom, var(--header-bg), var(--bg-color));
+        }
 
-    // 初次載入顯示 SEVENTEEN
-    switchCabinet('SEVENTEEN');
-</script>
+        .motto { font-size: 1.4rem; line-height: 2.2; letter-spacing: 3px; color: #5d4037; }
+
+        .big-cabinet {
+            width: 1000px;
+            border: 12px solid var(--shelf-wood);
+            background-color: #ebe4d8;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+            margin-top: 20px;
+            box-sizing: border-box; 
+        }
+
+        .cabinet-header {
+            background-color: var(--shelf-wood);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+
+        .shelf-layer {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 8px;
+            padding: 30px 15px 0 15px;
+            border-bottom: 15px solid var(--shelf-wood);
+            min-height: 260px;
+            align-items: flex-end;
+        }
+
+        .novel-spine {
+            height: 230px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            border-radius: 2px 2px 0 0;
+            box-shadow: inset -4px 0 6px rgba(0,0,0,0.2), 2px 0 10px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+            cursor: pointer;
+            padding: 15px 5px;
+            box-sizing: border-box;
+        }
+
+        .novel-spine:hover { transform: translateY(-20px); }
+        .spine-title { writing-mode: vertical-rl; color: white; font-size: 1.1rem; letter-spacing: 2px; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); }
+        .spine-color-code { color: rgba(255,255,255,0.9); font-size: 0.85rem; font-weight: bold; }
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 200; justify-content: center; align-items: center; }
+        .modal-content { background: var(--modal-bg); width: 90%; max-width: 700px; padding: 40px; border-radius: 10px; position: relative; }
+        .close-btn { position: absolute; top: 15px; right: 15px; font-size: 1.5rem; cursor: pointer; border: 2px solid #333; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; border-radius: 5px; }
+
+        .ao3-tags { font-size: 1.1rem; line-height: 1.8; margin: 20px 0; color: #333; }
+        .ao3-tags span { border-bottom: 1px dotted var(--tag-underline); margin-right: 8px; }
+        .ao3-tags .tag-bold { font-weight: bold; border-bottom: 1px solid #000; }
+
+        .book-detail-title { font-size: 2.8rem; margin: 15px 0 5px 0; }
+        .book-author { font-size: 1.2rem; color: #666; margin-bottom: 25px; border-bottom: 1px solid #ddd; padding-bottom: 10px; }
+        .read-btn { background: #4b32c3; color: white; padding: 12px 30px; border-radius: 8px; text-decoration: none; display: inline-block; font-size: 1.2rem; margin-top: 20px; }
+
+        @media (max-width: 1000px) { 
+            .big-cabinet { width: 95%; } 
+            .shelf-layer { grid-template-columns: repeat(4, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-links">
+            <div class="nav-item" onclick="switchCabinet('SEVENTEEN')">SEVENTEEN</div>
+            <div class="nav-item" onclick="switchCabinet('CRAVITY')">CRAVITY</div>
+            <div class="nav-item" onclick="switchCabinet('My Love')">My Love</div>
+            <div class="nav-item" onclick="switchCabinet('Cerulean')">Cerulean</div>
+        </div>
+        <div class="search-container">
+            <input type="text" id="shipSearch" placeholder="Search Ship Name..." oninput="handleSearch()">
+        </div>
+    </nav>
+
+    <header class="cover-header">
+        <div class="motto">
+            「我們積極相聚也毫不掙扎地品嚐捨離，<br>
+            遂把所能擁有的辰光化成分分秒秒的驚嘆。」
+        </div>
+    </header>
+
+    <div id="library-root"></div>
+
+    <div class="modal-overlay" id="modalOverlay" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <span class="close-btn" onclick="closeModal()">✕</span>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <script>
+        const libraryData = {
+            "SEVENTEEN": [
+                { color: "#c62828", books: [{title: "親愛的路人", author: "一比嘎", ships: ["喆漢"], tags: ["G", "Complete"], link: "#"}] },
+                { color: "#ef6c00", books: [] }, { color: "#f9a825", books: [] }, { color: "#2e7d32", books: [] }, { color: "#1565c0", books: [] }, { color: "#283593", books: [] }, { color: "#6a1b9a", books: [] }
+            ],
+            "CRAVITY": [
+                { color: "#c62828", books: [] }, { color: "#ef6c00", books: [] }, { color: "#f9a825", books: [] }, { color: "#2e7d32", books: [] }, { color: "#1565c0", books: [] }, { color: "#283593", books: [] }, { color: "#6a1b9a", books: [] }
+            ],
+            "My Love": [
+                { color: "#c62828", books: [] }, { color: "#ef6c00", books: [] }, { color: "#f9a825", books: [] }, { color: "#2e7d32", books: [] }, { color: "#1565c0", books: [] }, { color: "#283593", books: [] }, { color: "#6a1b9a", books: [] }
+            ],
+            "Cerulean": [
+                { 
+                    color: "#c62828", 
+                    books: [
+                        {
+                            title: "巧克力重疊", 
+                            author: "你自己", 
+                            ships: ["世琳/廷彬"], 
+                            tags: ["G", "Complete", "甜文"], 
+                            link: "#"
+                        }
+                    ] 
+                },
+                { color: "#ef6c00", books: [] }, { color: "#f9a825", books: [] }, { color: "#2e7d32", books: [] }, { color: "#1565c0", books: [] }, { color: "#283593", books: [] }, { color: "#6a1b9a", books: [] }
+            ]
+        };
+
+        let currentCabinet = 'SEVENTEEN';
+
+        function switchCabinet(name) {
+            currentCabinet = name;
+            document.getElementById('shipSearch').value = '';
+            renderCabinet(libraryData[name]);
+        }
+
+        function renderCabinet(layers) {
+            const root = document.getElementById('library-root');
+            root.innerHTML = `
+                <div class="big-cabinet">
+                    <div class="cabinet-header">${currentCabinet}</div>
+                    ${layers.map(layer => `
+                        <div class="shelf-layer">
+                            ${layer.books.map(book => `
+                                <div class="novel-spine" style="background-color: ${layer.color}" onclick='openModal(${JSON.stringify(book)})'>
+                                    <div class="spine-title">${book.title}</div>
+                                    <div class="spine-color-code">${layer.color}</div>
+                                </div>
+                            `).join('')}
+                            ${Array(Math.max(0, 8 - layer.books.length)).fill(0).map(() => `<div style="border-left: 1px solid rgba(0,0,0,0.05); height: 10px;"></div>`).join('')}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function handleSearch() {
+            const term = document.getElementById('shipSearch').value.toLowerCase();
+            const filteredLayers = libraryData[currentCabinet].map(layer => ({
+                ...layer,
+                books: layer.books.filter(book => book.ships.some(ship => ship.toLowerCase().includes(term)))
+            }));
+            renderCabinet(filteredLayers);
+        }
+
+        function openModal(book) {
+            const body = document.getElementById('modalBody');
+            body.innerHTML = `
+                <div class="book-detail-title">${book.title}</div>
+                <div class="book-author">by ${book.author}</div>
+                <div class="ao3-tags">
+                    <span class="tag-bold">${book.tags[0] || 'Tag'}</span>,
+                    ${book.ships.map(s => `<span>${s}</span>`).join(', ')},
+                    ${book.tags.slice(1).map(t => `<span>${t}</span>`).join(', ')}
+                </div>
+                <a href="${book.link}" target="_blank" class="read-btn">Read Original →</a>
+            `;
+            document.getElementById('modalOverlay').style.display = 'flex';
+        }
+
+        function closeModal() { document.getElementById('modalOverlay').style.display = 'none'; }
+        switchCabinet('SEVENTEEN');
+    </script>
+</body>
+</html>
