@@ -37,8 +37,8 @@
             gap: 10px;
         }
 
-        .nav-links { display: flex; gap: 25px; flex-wrap: wrap; justify-content: center; }
-        .nav-item { color: white; cursor: pointer; font-size: 1.2rem; text-decoration: none; letter-spacing: 1px; }
+        .nav-links { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
+        .nav-item { color: white; cursor: pointer; font-size: 1.1rem; text-decoration: none; letter-spacing: 1px; }
 
         .search-container { width: 80%; max-width: 400px; }
         #shipSearch { width: 100%; padding: 8px 15px; border-radius: 20px; border: none; outline: none; }
@@ -123,6 +123,7 @@
         <div class="nav-links">
             <div class="nav-item" onclick="switchCabinet('SEVENTEEN')">SEVENTEEN</div>
             <div class="nav-item" onclick="switchCabinet('CRAVITY')">CRAVITY</div>
+            <div class="nav-item" onclick="switchCabinet('FORMULA 1')">FORMULA 1</div>
             <div class="nav-item" onclick="switchCabinet('My Love')">My Love</div>
             <div class="nav-item" onclick="switchCabinet('Cerulean')">Cerulean</div>
         </div>
@@ -148,12 +149,14 @@
     </div>
 
     <script>
-        // 資料區：目前所有書櫃皆為空
         const libraryData = {
             "SEVENTEEN": [
                 { color: "#c62828", books: [] }, { color: "#ef6c00", books: [] }, { color: "#f9a825", books: [] }, { color: "#2e7d32", books: [] }, { color: "#1565c0", books: [] }, { color: "#283593", books: [] }, { color: "#6a1b9a", books: [] }
             ],
             "CRAVITY": [
+                { color: "#c62828", books: [] }, { color: "#ef6c00", books: [] }, { color: "#f9a825", books: [] }, { color: "#2e7d32", books: [] }, { color: "#1565c0", books: [] }, { color: "#283593", books: [] }, { color: "#6a1b9a", books: [] }
+            ],
+            "FORMULA 1": [
                 { color: "#c62828", books: [] }, { color: "#ef6c00", books: [] }, { color: "#f9a825", books: [] }, { color: "#2e7d32", books: [] }, { color: "#1565c0", books: [] }, { color: "#283593", books: [] }, { color: "#6a1b9a", books: [] }
             ],
             "My Love": [
