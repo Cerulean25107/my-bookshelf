@@ -59,6 +59,7 @@
             box-shadow: 0 20px 50px rgba(0,0,0,0.15);
             margin-top: 20px;
             box-sizing: border-box; 
+            position: relative;
         }
 
         .cabinet-header {
@@ -80,6 +81,24 @@
             border-bottom: 15px solid var(--shelf-wood);
             min-height: 260px;
             align-items: flex-end;
+            position: relative;
+        }
+
+        .shelf-sticker {
+            position: absolute;
+            bottom: -15px; 
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #fff9e6;
+            color: #5d4037;
+            padding: 4px 25px;
+            font-size: 1rem;
+            letter-spacing: 3px;
+            border: 1px solid #c4b5a4;
+            border-radius: 3px;
+            box-shadow: 1px 2px 5px rgba(0,0,0,0.15);
+            font-weight: bold;
+            z-index: 10;
         }
 
         .novel-spine {
@@ -97,20 +116,54 @@
         }
 
         .novel-spine:hover { transform: translateY(-20px); }
-        .spine-title { writing-mode: vertical-rl; color: white; font-size: 1.1rem; letter-spacing: 2px; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); }
-        .spine-color-code { color: rgba(255,255,255,0.9); font-size: 0.85rem; font-weight: bold; }
+        
+        .spine-title-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .spine-title { writing-mode: vertical-rl; color: white; font-size: 1.05rem; letter-spacing: 2px; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); }
+        .spine-chapter { color: rgba(255,255,255,0.75); font-size: 0.85rem; font-weight: bold; margin-bottom: 6px; }
+        
+        .spine-color-code { color: rgba(255,255,255,0.9); font-size: 0.8rem; font-weight: bold; letter-spacing: 0.5px; }
 
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 200; justify-content: center; align-items: center; }
-        .modal-content { background: var(--modal-bg); width: 90%; max-width: 700px; padding: 40px; border-radius: 10px; position: relative; }
-        .close-btn { position: absolute; top: 15px; right: 15px; font-size: 1.5rem; cursor: pointer; border: 2px solid #333; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; border-radius: 5px; }
+        .modal-content { background: var(--modal-bg); width: 90%; max-width: 750px; padding: 40px; border-radius: 10px; position: relative; max-height: 85vh; overflow-y: auto; }
+        .close-btn { position: absolute; top: 15px; right: 15px; font-size: 1.5rem; cursor: pointer; border: 2px solid #333; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; border-radius: 5px; background: white; z-index: 10; }
 
-        .ao3-tags { font-size: 1.1rem; line-height: 1.8; margin: 20px 0; color: #333; }
-        .ao3-tags span { border-bottom: 1px dotted var(--tag-underline); margin-right: 8px; }
-        .ao3-tags .tag-bold { font-weight: bold; border-bottom: 1px solid #000; }
+        .ao3-tags { font-size: 1.05rem; line-height: 1.8; margin: 15px 0; color: #333; border-bottom: 1px dashed #ccc; padding-bottom: 15px; }
+        .ao3-tags span { border-bottom: 1px dotted var(--tag-underline); margin-right: 8px; white-space: nowrap; }
+        .ao3-tags .tag-bold { font-weight: bold; border-bottom: 1px solid #000; color: #b33939; }
 
-        .book-detail-title { font-size: 2.8rem; margin: 15px 0 5px 0; }
-        .book-author { font-size: 1.2rem; color: #666; margin-bottom: 25px; border-bottom: 1px solid #ddd; padding-bottom: 10px; }
-        .read-btn { background: #4b32c3; color: white; padding: 12px 30px; border-radius: 8px; text-decoration: none; display: inline-block; font-size: 1.2rem; margin-top: 20px; }
+        .book-detail-title { font-size: 2.2rem; margin: 15px 0 5px 0; font-weight: bold; color: #2c3e50; }
+        .book-author { font-size: 1.1rem; color: #666; margin-bottom: 15px; }
+        
+        .book-story-content { 
+            font-size: 1.15rem; 
+            line-height: 2.3; 
+            color: #2b2b2b; 
+            text-align: justify; 
+            white-space: pre-line; 
+            margin-top: 20px;
+            padding: 0 10px;
+        }
+        .story-divider { text-align: center; color: #999; margin: 30px 0; letter-spacing: 5px; }
+
+        /* 原作連結按鈕樣式 */
+        .read-btn { 
+            background: #4b32c3; 
+            color: white; 
+            padding: 12px 30px; 
+            border-radius: 8px; 
+            text-decoration: none; 
+            display: inline-block; 
+            font-size: 1.2rem; 
+            margin-top: 30px;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(75, 50, 195, 0.2);
+            transition: background 0.2s;
+        }
+        .read-btn:hover { background: #3821a3; }
 
         @media (max-width: 1000px) { 
             .big-cabinet { width: 95%; } 
@@ -149,38 +202,55 @@
     </div>
 
     <script>
+        function interpolateColor(color1, color2, totalSteps, currentStep) {
+            const r1 = parseInt(color1.substring(1, 3), 16);
+            const g1 = parseInt(color1.substring(3, 5), 16);
+            const b1 = parseInt(color1.substring(5, 7), 16);
+            const r2 = parseInt(color2.substring(1, 3), 16);
+            const g2 = parseInt(color2.substring(3, 5), 16);
+            const b2 = parseInt(color2.substring(5, 7), 16);
+            const weight = currentStep / (totalSteps - 1);
+            const r = Math.round(r1 + (r2 - r1) * weight);
+            const g = Math.round(g1 + (g2 - g1) * weight);
+            const b = Math.round(b1 + (b2 - b1) * weight);
+            return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+        }
+
         const libraryData = {
             "SEVENTEEN": [
-                { color: "#c62828", books: [] }, { color: "#ef6c00", books: [] }, { color: "#f9a825", books: [] }, { color: "#2e7d32", books: [] }, { color: "#1565c0", books: [] }, { color: "#283593", books: [] }, { color: "#6a1b9a", books: [] }
-            ],
-            "CRAVITY": [
-                { color: "#c62828", books: [] }, { color: "#ef6c00", books: [] }, { color: "#f9a825", books: [] }, { color: "#2e7d32", books: [] }, { color: "#1565c0", books: [] }, { color: "#283593", books: [] }, { color: "#6a1b9a", books: [] }
-            ],
-            "FORMULA 1": [
-                { color: "#c62828", books: [] }, { color: "#ef6c00", books: [] }, { color: "#f9a825", books: [] }, { color: "#2e7d32", books: [] }, { color: "#1565c0", books: [] }, { color: "#283593", books: [] }, { color: "#6a1b9a", books: [] }
-            ],
-            "My Love": [
-                { color: "#c62828", books: [] }, { color: "#ef6c00", books: [] }, { color: "#f9a825", books: [] }, { color: "#2e7d32", books: [] }, { color: "#1565c0", books: [] }, { color: "#283593", books: [] }, { color: "#6a1b9a", books: [] }
-            ],
-            "Cerulean": [
-                { 
-                    color: "#802b2b", // 栗色
+                {
+                    color: "#c29494", 
                     books: [
                         {
-                            title: "明信片・甜點・你", 
-                            author: "Jung_Song", 
-                            ships: ["Chwe Hansol | Vernon/Boo Seungkwan"], 
-                            tags: ["G", "Ongoing", "healing", "木質香氣"], 
-                            link: "https://archiveofourown.org/works/66972001?view_full_work=true"
-                        }
-                    ] 
+                            title: "Ch1", 
+                            author: "Cerulean", 
+                            ships: ["李知勳/李碩珉 (Woozi/DK)"], 
+                            tags: ["G", "Complete", "2023大阪FanMeeting後續", "微醺道兼", "傲嬌知勳", "溫柔知秀", "Same_Dream_Same_Mind_Same_Night"],
+                            link: "https://yanjiaoyuguang.webnode.tw/l/17-musicstory-dkwoozi/", 
+                            
+                        },
+                        // 這裡可以依序填入 ch2 ~ ch8 各自獨立的 AO3 網址 (link)
+                        { title: "Ch2", author: "Waterbluej", ships: ["Lee Seok Min | DK/Lee Ji Hoon | Woozi"], tags: ["Complete"], link: "https://archiveofourown.org/works/你的第二章網址", intro: "", content: "精采續集待續中...", outro: "" },
+                        { title: "Ch3", author: "Waterbluej", ships: ["李知勳/李碩珉 (Woozi/DK)"], tags: ["Ongoing"], link: "https://archiveofourown.org/works/你的第三章網址", intro: "", content: "精采續集待續中...", outro: "" },
+                        { title: "Ch4", author: "Waterbluej", ships: ["李知勳/李碩珉 (Woozi/DK)"], tags: ["Ongoing"], link: "https://archiveofourown.org/works/你的第四章網址", intro: "", content: "精采續集待續中...", outro: "" },
+                        { title: "Ch5", author: "Waterbluej", ships: ["李知勳/李碩珉 (Woozi/DK)"], tags: ["Ongoing"], link: "https://archiveofourown.org/works/你的第五章網址", intro: "", content: "精采續集待續中...", outro: "" },
+                        { title: "Ch6", author: "Waterbluej", ships: ["李知勳/李碩珉 (Woozi/DK)"], tags: ["Ongoing"], link: "https://archiveofourown.org/works/你的第六章網址", intro: "", content: "精采續集待續中...", outro: "" },
+                        { title: "日本FM番外篇", author: "Waterbluej", ships: ["李知勳/李碩珉 (Woozi/DK)"], tags: ["Ongoing"], link: "https://archiveofourown.org/works/你的第七章網址", intro: "", content: "精采續集待續中...", outro: "" },
+                        { title: "日本FM番外篇之番外", author: "Waterbluej", ships: ["李知勳/李碩珉 (Woozi/DK)"], tags: ["Ongoing"], link: "https://archiveofourown.org/works/你的第八章網址", intro: "", content: "精采續集待續中...", outro: "" }
+                    ]
                 },
-                { color: "#ef6c00", books: [] }, 
-                { color: "#f9a825", books: [] }, 
-                { color: "#2e7d32", books: [] }, 
-                { color: "#1565c0", books: [] }, 
-                { color: "#283593", books: [] }, 
-                { color: "#6a1b9a", books: [] }
+            
+            ],
+            "CRAVITY": [{ color: "#c62828", books: [] }, { color: "#ef6c00", books: [] }],
+            "FORMULA 1": [{ color: "#c62828", books: [] }, { color: "#ef6c00", books: [] }],
+            "My Love": [{ color: "#c62828", books: [] }, { color: "#ef6c00", books: [] }],
+            "Cerulean": [
+                { 
+                    color: "#802b2b", 
+                    books: [
+                        { title: "明信片・甜點・你", author: "Jung_Song", ships: ["Chwe Hansol | Vernon/Boo Seungkwan"], tags: ["G", "Ongoing", "healing", "木質香氣"], link: "https://archiveofourown.org/works/66972001?view_full_work=true", intro: "明信片、甜點與你的浪漫故事...", content: "正文內容...", outro: "" }
+                    ] 
+                }
             ]
         };
 
@@ -194,22 +264,34 @@
 
         function renderCabinet(layers) {
             const root = document.getElementById('library-root');
+            let globalBookIdx = 0; 
+            const startColor = "#c29494";
+            const endColor = "#94b2c2";
+
             root.innerHTML = `
                 <div class="big-cabinet">
                     <div class="cabinet-header">${currentCabinet}</div>
-                    ${layers.map(layer => `
+                    ${layers.map((layer, layerIdx) => `
                         <div class="shelf-layer">
-                            ${layer.books.map(book => {
-                                // 修正處：將 JSON 字串中的雙引號與單引號做好 HTML 安全轉義，防止 HTML 屬性被截斷
+                            ${layer.books.map((book) => {
+                                let spineColor = layer.color;
+                                if (currentCabinet === 'SEVENTEEN') {
+                                    spineColor = interpolateColor(startColor, endColor, 10, globalBookIdx);
+                                }
+                                globalBookIdx++;
                                 const bookJson = JSON.stringify(book).replace(/'/g, "&apos;").replace(/"/g, "&quot;");
                                 return `
-                                    <div class="novel-spine" style="background-color: ${layer.color}" onclick="openModal('${bookJson}')">
-                                        <div class="spine-title">${book.title}</div>
-                                        <div class="spine-color-code">${layer.color}</div>
+                                    <div class="novel-spine" style="background-color: ${spineColor}" onclick="openModal('${bookJson}')">
+                                        <div class="spine-title-container">
+                                            <div class="spine-chapter">ch${globalBookIdx}</div>
+                                            <div class="spine-title">${book.title}</div>
+                                        </div>
+                                        <div class="spine-color-code">${spineColor.toUpperCase()}</div>
                                     </div>
                                 `;
                             }).join('')}
                             ${Array(Math.max(0, 8 - layer.books.length)).fill(0).map(() => `<div style="border-left: 1px solid rgba(0,0,0,0.05); height: 10px;"></div>`).join('')}
+                            ${currentCabinet === 'SEVENTEEN' && layerIdx === layers.length - 1 ? `<div class="shelf-sticker">seventeen 的音樂故事</div>` : ''}
                         </div>
                     `).join('')}
                 </div>
@@ -225,10 +307,16 @@
             renderCabinet(filteredLayers);
         }
 
-        // 修正處：傳進來的 book 在方案 A 中是轉義過的 JSON 字串，需解析回 Object
         function openModal(bookData) {
             const book = typeof bookData === 'string' ? JSON.parse(bookData) : bookData;
             const body = document.getElementById('modalBody');
+            
+            const introHtml = book.intro ? `<div class="book-story-content" style="color: #666; font-style: italic; border-left: 3px solid #c29494; padding-left: 15px; margin-bottom: 30px;">${book.intro}</div><div class="story-divider">◆ ◆ ◆ 正文開始 ◆ ◆ ◆</div>` : '';
+            const outroHtml = book.outro ? `<div class="story-divider">◆ ◆ ◆ 後記 ◆ ◆ ◆</div><div class="book-story-content" style="color: #555; background: #fdfbf7; padding: 15px; border-radius: 5px; font-size: 1.05rem;">${book.outro}</div>` : '';
+            
+            // 新增處：如果書籍物件裡有填 link，就渲染出那顆紫色的 Read Original 按鈕
+            const linkHtml = book.link ? `<div style="text-align: center;"><a href="${book.link}" target="_blank" class="read-btn">Read Original →</a></div>` : '';
+
             body.innerHTML = `
                 <div class="book-detail-title">${book.title}</div>
                 <div class="book-author">by ${book.author}</div>
@@ -237,14 +325,17 @@
                     ${book.ships.map(s => `<span>${s}</span>`).join(', ')},
                     ${book.tags.slice(1).map(t => `<span>${t}</span>`).join(', ')}
                 </div>
-                <a href="${book.link}" target="_blank" class="read-btn">Read Original →</a>
+                
+                ${introHtml}
+                <div class="book-story-content">${book.content}</div>
+                ${outroHtml}
+                
+                ${linkHtml}
             `;
             document.getElementById('modalOverlay').style.display = 'flex';
         }
 
         function closeModal() { document.getElementById('modalOverlay').style.display = 'none'; }
-        
-        // 初始化
         switchCabinet('SEVENTEEN');
     </script>
 </body>
